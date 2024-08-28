@@ -15,10 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
+from django.views.generic import RedirectView
 from djgentelella.urls import urlpatterns as urls_djgentelella
+from feriados.urls import urlpatterns as admin_urls
 
 urlpatterns = urls_djgentelella + [
     path('admin/', admin.site.urls),
-    path('', include("feriados.urls")),
+    path('', RedirectView.as_view(url=reverse_lazy('holidays:home')), name='home'),
+    path('holidays/', include((admin_urls, 'holidays'), namespace="holidays"))
 ]
