@@ -24,3 +24,6 @@ def index(request):
             return HttpResponse(serializer.errors, status=400)
 
 
+def load_holidays(request):
+
+    return render(request, "feriados/index.html")
