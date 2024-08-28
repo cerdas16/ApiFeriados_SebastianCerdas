@@ -15,8 +15,6 @@ class PublicHolidaySerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"Initial representation: {representation}")  # Verifica los datos iniciales
-
         date = representation.get('date')
 
         if date:
@@ -26,6 +24,5 @@ class PublicHolidaySerializer(serializers.Serializer):
 
         else:
             representation['dayOfWeek'] = 'Unknown'
-        print(f"Representation with dayOfWeek: {representation}")  # Verifica la representación final
 
         return representation

@@ -10,7 +10,7 @@
 
     <div class="container">
 
-        <h1>Manage Accounts of Clients</h1>
+        <h1>Filters of the holidays</h1>
 
         {{ exist }}
 
@@ -18,23 +18,23 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Client Name</th>
-                    <th>Client Name</th>
-                    <th>Bank Fund</th>
+                    <th>Date</th>
+                    <th>Day of Week</th>
+                    <th>Holiday Name</th>
+                    <th>Country Code</th>
                 </tr>
             </thead>
             <tbody>
 
-                {% for account in data %}
+                {% for holiday in data %}
                     <tr>
-                        <td>{{account.date}}</td>
-                        <td>{{account.localName}}</td>
-                        <td>{{account.countryCode}}</td>
-                        <td>{{account.dayOfWeek}}</td>
+                        <td>{{holiday.date}}</td>
+                        <td>{{holiday.localName}}</td>
+                        <td>{{holiday.countryCode}}</td>
+                        <td>{{holiday.dayOfWeek}}</td>
                     </tr>
                     {% empty %}
-                        {{clients}}
+                        <p>Don´t have data</p>
                 {% endfor %}
 
 
