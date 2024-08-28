@@ -18,8 +18,7 @@ def index(request):
         serializer = PublicHolidaySerializer(data=json_data, many=True)
 
         if serializer.is_valid():
-            data_serializer = serializer.validated_data
-            return HttpResponse(data_serializer)
+            data_serializer = serializer.data
             return render(request, 'feriados/index.html', {'data': data_serializer})
         else:
             return HttpResponse(serializer.errors, status=400)
