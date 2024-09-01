@@ -18,15 +18,15 @@ class ListHolidays(ListAPIView):
     #authentication_classes = [SessionAuthentication, BasicAuthentication]
     #permission_classes = [IsAuthenticated]
 
-    serializer_class = PublicHolidaySerializer
-    pagination_class = PageNumberPagination
-
     def list(self, request, *args, **kwargs):
 
-        start_date = '2021-01-01'
-        end_date = '2021-07-08'
+        year = request.POST.get('year', '2024')
+        country = request.POST.get('country', 'CR')
+        start_date = request.POST.get('start_date', '2024-01-01')
+        end_date = request.POST.get('end_date', '2024-04-11')
+        name_filter = request.POST.get('name', 'Año Nuevo')
 
-        with urllib.request.urlopen('https://date.nager.at/api/v2/publicholidays/2021/CR') as response:
+        with urllib.request.urlopen('https://date.nager.at/api/v2/publicholidays/'+year+'/'+country) as response:
             data = response.read()
             json_data = json.loads(data.decode('utf-8'))
 
@@ -34,45 +34,25 @@ class ListHolidays(ListAPIView):
         if serializer.is_valid():
             data_serializer = serializer.data
 
+
+        if not start_date:
             filtered_data = [
                 holiday for holiday in data_serializer
-                if start_date <= holiday['date'] <= end_date
+                if (name_filter == '' or name_filter.lower() in holiday['name'].lower())
             ]
+            page = self.paginate_queryset(filtered_data)
+            if page is not None:
+                return self.get_paginated_response(page)
 
+            return Response({'data': data_serializer})
+        else:
+            filtered_data = [
+                holiday for holiday in data_serializer
+                if start_date <= holiday['date'] <= end_date and (name_filter == '' or name_filter.lower() in holiday['localName'].lower())
+            ]
             page = self.paginate_queryset(filtered_data)
             if page is not None:
                 return self.get_paginated_response(page)
 
             return Response({'data': filtered_data})
 
-    def listYear(self, request, *args, **kwargs):
-        year = '2022'
-        with urllib.request.urlopen('https://date.nager.at/api/v2/publicholidays/' + year + '/CR') as response:
-            data = response.read()
-            json_data = json.loads(data.decode('utf-8'))
-
-        serializer = PublicHolidaySerializer(data=json_data, many=True)
-        if serializer.is_valid():
-            data_serializer = serializer.data
-
-        page = self.paginate_queryset(data_serializer)
-        if page is not None:
-            return self.get_paginated_response(page)
-
-        return Response({'data': data_serializer})
-
-    def listCountry(self, request, *args, **kwargs):
-        country = 'CR'
-        with urllib.request.urlopen('https://date.nager.at/api/v2/publicholidays/2021/' + country) as response:
-            data = response.read()
-            json_data = json.loads(data.decode('utf-8'))
-
-        serializer = PublicHolidaySerializer(data=json_data, many=True)
-        if serializer.is_valid():
-            data_serializer = serializer.data
-
-        page = self.paginate_queryset(data_serializer)
-        if page is not None:
-            return self.get_paginated_response(page)
-
-        return Response({'data': data_serializer})
