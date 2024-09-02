@@ -26,3 +26,4 @@ class PublicHolidaySerializer(serializers.Serializer):
             representation['dayOfWeek'] = 'Unknown'
 
         return representation
+
