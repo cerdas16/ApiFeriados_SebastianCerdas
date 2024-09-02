@@ -9,6 +9,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from feriados.api.serializers import PublicHolidaySerializer
 
@@ -19,12 +20,11 @@ class ListHolidays(ListAPIView):
     #permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-
-        year = request.POST.get('year', '2024')
-        country = request.POST.get('country', 'CR')
-        start_date = request.POST.get('start_date', '2024-01-01')
-        end_date = request.POST.get('end_date', '2024-04-11')
-        name_filter = request.POST.get('name', 'Año Nuevo')
+        year = request.GET.get('year', '2024')
+        country = request.GET.get('country', 'CR')
+        start_date = request.GET.get('start_date', '')
+        end_date = request.GET.get('end_date', '')
+        name_filter = request.GET.get('localName', '')
 
         with urllib.request.urlopen('https://date.nager.at/api/v2/publicholidays/'+year+'/'+country) as response:
             data = response.read()
@@ -38,13 +38,13 @@ class ListHolidays(ListAPIView):
         if not start_date:
             filtered_data = [
                 holiday for holiday in data_serializer
-                if (name_filter == '' or name_filter.lower() in holiday['name'].lower())
+                if (name_filter == '' or name_filter.lower() in holiday['localName'].lower())
             ]
             page = self.paginate_queryset(filtered_data)
             if page is not None:
                 return self.get_paginated_response(page)
 
-            return Response({'data': data_serializer})
+            return Response({'data': filtered_data})
         else:
             filtered_data = [
                 holiday for holiday in data_serializer
